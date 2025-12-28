@@ -1,3 +1,5 @@
+/// <reference lib="webworker" />
+
 /*
  * This file (which will be your service worker)
  * is picked up by the build system ONLY if
@@ -5,7 +7,7 @@
  */
 
 declare const self: ServiceWorkerGlobalScope &
-  typeof globalThis & { skipWaiting: () => void };
+  typeof globalThis & { skipWaiting: () => void; __WB_MANIFEST?: any };
 
 import { clientsClaim } from 'workbox-core';
 import {

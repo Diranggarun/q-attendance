@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { copyToClipboard, date, Notify, uid, useQuasar } from 'quasar';
+import ImportUsersDialog from 'src/components/ImportUsersDialog.vue';
 import { useClassStore } from 'src/stores/class-store';
 import { useAuthStore } from 'src/stores/auth-store';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
@@ -12,6 +13,7 @@ const router = useRouter();
 const $q = useQuasar();
 
 const showNewClassDialog = ref(false);
+const showImportDialog = ref(false);
 const className = ref('');
 const classSection = ref('');
 
@@ -164,13 +166,23 @@ function createAttendance() {
   <q-page class="q-pa-md allCards">
     <div class="row items-center justify-between q-mb-lg">
       <div class="text-h5 text-weight-bold">My Classes</div>
-      <q-btn
+      <div class="row items-center">
+        <q-btn
         color="primary"
         icon="assignment"
         label="Create Attendance"
         @click="createAttendance"
         unelevated
-      />
+        />
+        <q-btn
+          class="q-ml-sm"
+          color="primary"
+          icon="file_upload"
+          label="Import Users"
+          @click="showImportDialog = true"
+          unelevated
+        />
+      </div>
     </div>
 
     <div class="row q-col-gutter-md">
@@ -303,6 +315,9 @@ function createAttendance() {
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- Import Users dialog for teachers -->
+    <ImportUsersDialog v-model="showImportDialog" :ownerKey="authStore.teacherAccount?.ownerKey || ''" />
   </q-page>
 </template>
 

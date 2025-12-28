@@ -1,0 +1,5 @@
+fullName,email,role,status
+Alice Johnson,alice@example.com,student,active
+Bob Smith,bob@example.com,student,active
+Carol Teacher,carol.teacher@example.com,teacher,active
+Bob Clone,bob@example.com,student,active

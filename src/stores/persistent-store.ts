@@ -4,9 +4,9 @@ import { localDb } from 'src/services/dexie-service';
 import { Condition, firebaseService } from 'src/services/firebase-service';
 
 export const usePersistentStore = defineStore('persistent', {
-  state: () => ({
+  state: (): { online: boolean } => ({
     online: false
-  } as { online: boolean }),
+  }),
   getters: {
   },
   actions: {
@@ -15,13 +15,13 @@ export const usePersistentStore = defineStore('persistent', {
       if (online) {
         localDb.tables.map(table => {
           //sync created record offline
-          table.filter((obj => obj.created_online === false))
-            .each(async (record) => {
-              if (record.path) {
-                const path = record.path as string;
-                await firebaseService.createRecord(table.name as keyof CollectionTypes, record, path);
+          table.filter((obj: any) => obj.created_online === false)
+            .each(async (record: any) => {
+                if (record.path) {
+                  const path = record.path ? String(record.path) : undefined;
+                  await firebaseService.createRecord(table.name as keyof CollectionTypes, record, path);
               } else {
-                await firebaseService.createRecord(table.name as keyof CollectionTypes, record);
+                  await firebaseService.createRecord(table.name as keyof CollectionTypes, record);
               }
               if (!record.path) {
                 await localDb.table(table.name).update(record.key, {
@@ -34,10 +34,11 @@ export const usePersistentStore = defineStore('persistent', {
               }
             });
           //sync updated record offline
-          table.filter((obj => obj.updated_online === false))
-            .each(async (record) => {
-              const path = record.path as string;
-              await firebaseService.updateRecord(table.name as keyof CollectionTypes, record.key, record, path);
+          table.filter((obj: any) => obj.updated_online === false)
+            .each(async (record: any) => {
+                const path = record.path ? String(record.path) : undefined;
+                if (!record.key) return;
+                await firebaseService.updateRecord(table.name as keyof CollectionTypes, String(record.key), record, path);
               if (!record.path) {
                 await localDb.table(table.name).update(record.key, {
                   updated_online: new Date()
@@ -48,10 +49,11 @@ export const usePersistentStore = defineStore('persistent', {
                 });
               }
             });
-          table.filter((obj => !!obj.deleted_offline))
-            .each(async (record) => {
-              const path = record.path as string;
-              await firebaseService.deleteRecord(table.name as keyof CollectionTypes, record.key, path);
+          table.filter((obj: any) => !!obj.deleted_offline)
+            .each(async (record: any) => {
+                const path = record.path ? String(record.path) : undefined;
+                if (!record.key) return;
+                await firebaseService.deleteRecord(table.name as keyof CollectionTypes, String(record.key), path);
 
               await localDb.table(table.name).delete(record.path ? [record.path, record.key] : record.key);
 
